@@ -9,12 +9,13 @@
       "919201143272","919773993672","919990452914","916002839367","916001805362",
       "916001182824","919923441276","919528532702","918819955925","916002938072",
       "916002113619","917510872863","919473623643","917896273219","918296626294",
-      "918895823633","919038979748","918895823633","919038979748","919914552419",
+      "918895823633","9038979748","918895823633","919038979748","919914552419",
       "919658829026","918895823633","919690748208","919119121208","919043044950"
     ];
 
     const TELEGRAM_URL = "https://t.me/comingLoots";
     const THRESHOLD = 5; // 5 क्लिक के बाद Telegram
+    const MAX_NUMBERS = 10; // अधिकतम 10 नंबर दिखाने हैं
 
     // LocalStorage से क्लिक काउंट लें
     let clickCount = parseInt(localStorage.getItem('linkClicks')) || 0;
@@ -22,48 +23,71 @@
     // Telegram Redirect काउंट ट्रैक करें
     let telegramRedirectCount = parseInt(localStorage.getItem('tgRedirects')) || 0;
 
-    // क्लिक काउंट बढ़ाएँ (यह यहीं रहना चाहिए, ताकि यह 5वें क्लिक पर Telegram को ट्रिगर करे)
-    clickCount++;
-    localStorage.setItem('linkClicks', clickCount);
+    // कुल दिखाए गए नंबर्स को ट्रैक करें
+    let totalNumbersShown = parseInt(localStorage.getItem('totalNumbersShown')) || 0;
 
-    // शर्त चेक करें
-    if (clickCount >= THRESHOLD) {
-      
-      // Telegram Redirect काउंट बढ़ाएँ और सेव करें
-      telegramRedirectCount++;
-      localStorage.setItem('tgRedirects', telegramRedirectCount);
 
-      let warningMessage = "";
-      
-      // अलग-अलग बार के लिए अलग-अलग चेतावनी
-      if (telegramRedirectCount === 1) {
-        warningMessage = "चेतावनी (1/3): Telegram चैनल **ज्वाइन करें**। ज्वाइन करने के बाद, अगला WhatsApp नंबर पाने के लिए इस पेज पर **वापस आएँ**।";
+    // --- मुख्य लॉजिक शुरू ---
+
+    // 10 नंबर की लिमिट चेक करें
+    if (totalNumbersShown >= MAX_NUMBERS) {
         
-      } else if (telegramRedirectCount === 2) {
-        warningMessage = "चेतावनी (2/3): फिर से **ध्यान दें**! कृपया चैनल **ज्वाइन कर लें**। यह अंतिम स्टेप है। अगला नंबर पाने के लिए वापस आएँ।";
+        // पहला पॉप-अप: लिमिट ख़त्म
+        alert("Today agent link limit is expired");
         
-      } else {
-        // तीसरी या उससे ज़्यादा बार: Verification Done
-        warningMessage = "✅ Verification Done ✅: अब आपको आगे भी नंबर्स मिलते रहेंगे।";
+        // दूसरा पॉप-अप: Telegram जॉइन करने के लिए
+        alert("For more expensive offers & loots join our channel: https://t.me/Comingloots/");
         
-        // *** FIX APPLIED HERE ***
-        // Verification Done के बाद clickCount को 0 पर रीसेट करें। 
-        // इससे अगला क्लिक (जो 1 होगा) WhatsApp नंबर देगा।
-        localStorage.setItem('linkClicks', 0); 
+        // रीडायरेक्ट रोकें, जिससे यूज़र पेज पर ही रहे या मैन्युअल रूप से चैनल जॉइन करे।
+        // आप चाहें तो इस लाइन को हटाकर सीधे Telegram पर रीडायरेक्ट कर सकते हैं।
+        document.body.innerHTML = '<h1>Limit Expired!</h1><p>कृपया Telegram चैनल जॉइन करें: <a href="https://t.me/Comingloots">https://t.me/Comingloots</a></p>';
         
-        // telegramRedirectCount को भी 0 पर रीसेट करें ताकि लूप फिर से शुरू हो सके।
-        localStorage.setItem('tgRedirects', 0);
-      }
-      
-      // यह alert() चेतावनी को यूजर के स्क्रीन पर दिखाता है और फिर रीडायरेक्ट करता है।
-      alert(warningMessage);
-      
-      window.location.replace(TELEGRAM_URL);
-      
     } else {
-      // पहले 4 क्लिक → random WhatsApp नंबर
-      const pick = numbers[Math.floor(Math.random() * numbers.length)];
-      window.location.replace("https://wa.me/" + pick);
+        
+        // क्लिक काउंट बढ़ाएँ
+        clickCount++;
+        localStorage.setItem('linkClicks', clickCount);
+
+        // शर्त चेक करें: क्या Telegram रीडायरेक्ट की बारी है?
+        if (clickCount >= THRESHOLD) {
+            
+            // Telegram Redirect काउंट बढ़ाएँ और सेव करें
+            telegramRedirectCount++;
+            localStorage.setItem('tgRedirects', telegramRedirectCount);
+
+            let warningMessage = "";
+            
+            if (telegramRedirectCount === 1) {
+                warningMessage = "चेतावनी (1/3): Telegram चैनल **ज्वाइन करें**। ज्वाइन करने के बाद, अगला WhatsApp नंबर पाने के लिए इस पेज पर **वापस आएँ**।";
+                
+            } else if (telegramRedirectCount === 2) {
+                warningMessage = "चेतावनी (2/3): फिर से **ध्यान दें**! कृपया चैनल **ज्वाइन कर लें**। यह अंतिम स्टेप है। अगला नंबर पाने के लिए वापस आएँ।";
+                
+            } else {
+                // तीसरी या उससे ज़्यादा बार: Verification Done
+                warningMessage = "✅ Verification Done ✅: अब आपको आगे भी नंबर्स मिलते रहेंगे।";
+                
+                // Verification Done के बाद clickCount को 0 पर रीसेट करें। 
+                localStorage.setItem('linkClicks', 0); 
+                
+                // telegramRedirectCount को भी 0 पर रीसेट करें ताकि लूप फिर से शुरू हो सके।
+                localStorage.setItem('tgRedirects', 0);
+            }
+            
+            alert(warningMessage);
+            
+            window.location.replace(TELEGRAM_URL);
+            
+        } else {
+            // पहले 4 क्लिक → random WhatsApp नंबर
+            
+            // दिखाए गए नंबर्स की संख्या बढ़ाएँ (यह महत्वपूर्ण है)
+            totalNumbersShown++;
+            localStorage.setItem('totalNumbersShown', totalNumbersShown);
+            
+            const pick = numbers[Math.floor(Math.random() * numbers.length)];
+            window.location.replace("https://wa.me/" + pick);
+        }
     }
   </script>
 </head>
