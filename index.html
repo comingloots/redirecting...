@@ -12,20 +12,18 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: linear-gradient(135deg, #ff4d4d, #ff944d);
-      color: #fff;
+      background: #ff944d;
       text-align: center;
     }
 
     .btn {
-      display: none; /* Only show 6th click onwards */
+      display: none;
       padding: 14px 22px;
       border-radius: 10px;
       background: #00e676;
       color: #fff;
       font-weight: 700;
       text-decoration: none;
-      box-shadow: 0 4px 14px rgba(255,255,255,0.3);
       animation: pulse 1s infinite;
     }
     @keyframes pulse {
@@ -34,37 +32,31 @@
       100% { box-shadow: 0 0 0 0 rgba(0,230,118,0); }
     }
 
-    .modal-overlay {
-      position: fixed;
-      top:0; left:0; right:0; bottom:0;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s ease, visibility 0.3s;
-    }
-    .modal-overlay.active { visibility: visible; opacity: 1; }
     .modal {
+      display: none;
+      position: fixed; top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
       background: #fff;
       color: #e53935;
-      padding: 24px 20px;
-      border-radius: 14px;
+      padding: 20px;
+      border-radius: 10px;
       max-width: 300px;
       text-align: center;
     }
-    .modal h3 { margin-top: 0; font-size: 16px; }
-    .modal .modal-btn {
-      margin-top: 16px;
+    .modal-content a {
+      margin-top: 10px;
       display: inline-block;
-      padding: 12px 20px;
-      border-radius: 8px;
+      padding: 10px 16px;
       background: #e53935;
       color: #fff;
-      font-weight: 700;
       text-decoration: none;
+      border-radius: 6px;
+      font-weight: 700;
     }
   </style>
 </head>
@@ -72,20 +64,14 @@
 
   <a id="joinBtn" class="btn" href="#">Number ready after join!</a>
 
-  <!-- Modal -->
-  <div id="modal" class="modal-overlay">
-    <div class="modal">
-      <h3>⚠️ Make sure you have joined the Telegram channel!</h3>
-      <a id="modalConfirm" class="modal-btn" href="#">OK, got it</a>
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <p>⚠️ Make sure you have joined the Telegram channel!</p>
+      <a id="modalConfirm" href="#">OK, got it</a>
     </div>
   </div>
 
   <script>
-    const joinBtn = document.getElementById("joinBtn");
-    const modal = document.getElementById("modal");
-    const modalConfirm = document.getElementById("modalConfirm");
-
-    const TELEGRAM_URL = "https://t.me/comingLoots";
     const numbers = [
       "916204154483","919046513785","916203581303","918433012238","917351485279",
       "919201143272","919773993672","919990452914","916002839367","916001805362",
@@ -95,42 +81,43 @@
       "919119121208","919043044950"
     ];
 
+    const TELEGRAM_URL = "https://t.me/comingLoots";
     const CLICK_KEY = "lootsClicks";
     let clicks = parseInt(localStorage.getItem(CLICK_KEY)) || 0;
 
-    // Function to handle click
-    function handleClick(){
+    const joinBtn = document.getElementById("joinBtn");
+    const modal = document.getElementById("modal");
+    const modalConfirm = document.getElementById("modalConfirm");
+
+    function redirectToWhatsApp() {
+      const pick = numbers[Math.floor(Math.random() * numbers.length)];
+      window.location.href = "https://wa.me/" + pick;
+    }
+
+    function handleClick() {
       clicks++;
       localStorage.setItem(CLICK_KEY, clicks);
 
-      if(clicks <= 5){
-        // First 5 clicks → direct WhatsApp
-        const pick = numbers[Math.floor(Math.random() * numbers.length)];
-        window.location.href = "https://wa.me/" + pick;
+      if (clicks <= 5) {
+        redirectToWhatsApp();
         return;
       }
 
-      // 6th click → show animation + modal
+      // Show button + modal on 6th click
       joinBtn.style.display = "inline-block";
       modal.classList.add("active");
     }
 
-    // Listen to body click only once to trigger
-    document.body.addEventListener("click", handleClick, { once: false });
+    document.body.addEventListener("click", handleClick);
 
-    modalConfirm.addEventListener("click", function(e){
+    modalConfirm.addEventListener("click", function(e) {
       e.preventDefault();
       modal.classList.remove("active");
 
-      // Open Telegram
       window.open(TELEGRAM_URL, "_blank");
+      redirectToWhatsApp();
 
-      const pick = numbers[Math.floor(Math.random() * numbers.length)];
-
-      setTimeout(() => {
-        window.location.href = "https://wa.me/" + pick;
-        localStorage.setItem(CLICK_KEY, "0"); // reset clicks
-      }, 500);
+      localStorage.setItem(CLICK_KEY, "0"); // reset counter
     });
   </script>
 
