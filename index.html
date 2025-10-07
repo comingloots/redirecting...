@@ -14,8 +14,8 @@
     ];
 
     const TELEGRAM_URL = "https://t.me/comingLoots";
-    const THRESHOLD = 5; // 5 क्लिक के बाद Telegram
-    const MAX_NUMBERS = 10; // अधिकतम 10 नंबर दिखाने हैं
+    const THRESHOLD = 5; 
+    const MAX_NUMBERS = 10; 
 
     // LocalStorage से काउंट लें
     let clickCount = parseInt(localStorage.getItem('linkClicks')) || 0;
@@ -25,10 +25,7 @@
     
     // --- लिमिट समाप्त होने पर HTML डिस्प्ले फ़ंक्शन ---
     function showLimitExpired() {
-        // सुनिश्चित करें कि बॉडी खाली हो ताकि "Redirecting..." न दिखे
-        document.body.innerHTML = ''; 
-        
-        // नया HTML संदेश दिखाएँ
+        // यह सुनिश्चित करता है कि बॉडी खाली हो और केवल नया HTML दिखे
         document.body.innerHTML = `
             <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
                 <h1 style="color: red; font-size: 2em;">Today Agent Link Limit is Expired! 🚫</h1>
@@ -87,7 +84,7 @@
         setTimeout(() => {
             alert(followUpMessage);
             window.location.replace(TELEGRAM_URL);
-        }, 100); // 100ms का डिले, जिससे यूज़र को दूसरा अलर्ट बिना रिफ्रेश किए मिल जाए
+        }, 100); 
         
     } else {
         // 4. WhatsApp नंबर देने की बारी है 
@@ -95,7 +92,7 @@
         totalNumbersShown++;
         localStorage.setItem('totalNumbersShown', totalNumbersShown);
         
-        // 5. जाँच करें: क्या यह 10वाँ नंबर है? (Limit Expired अब यहीं आएगा)
+        // 5. जाँच करें: क्या यह 10वाँ नंबर है? 
         if (totalNumbersShown >= MAX_NUMBERS) {
             
             showLimitExpired();
@@ -108,7 +105,6 @@
     }
   </script>
 </head>
-<body>
-  <p>Redirecting...</p>
-</body>
+<body onload="document.body.innerHTML = ''">
+  </body>
 </html>
