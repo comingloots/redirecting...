@@ -5,9 +5,10 @@
   <title>redirecting</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* Body styles */
     body {
       margin: 0;
-      font-family: "Poppins", Arial, sans-serif;
+      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -15,22 +16,9 @@
       background: linear-gradient(135deg, #ff4d4d, #ff944d);
       color: #fff;
       text-align: center;
-      padding: 20px;
     }
 
-    .card {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(12px);
-      padding: 32px 20px;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 380px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-    }
-
-    h2 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-    p { font-size: 16px; margin-bottom: 20px; line-height: 1.4; }
-
+    /* Button style for 6th click onwards */
     .btn {
       display: inline-block;
       padding: 14px 22px;
@@ -92,11 +80,8 @@
 </head>
 <body>
 
-  <div class="card">
-    <h2>Want the number? 🥶🫢</h2>
-    <p>Click below. First 5 clicks will give random WhatsApp numbers.</p>
-    <a id="joinBtn" class="btn" href="#">Get Number</a>
-  </div>
+  <!-- Button visible only for 6th click onwards -->
+  <a id="joinBtn" class="btn" href="#" style="display:none;">Number ready after join!</a>
 
   <!-- Modal -->
   <div id="modal" class="modal-overlay">
@@ -124,35 +109,34 @@
     const CLICK_KEY = "lootsClicks";
     let clicks = parseInt(localStorage.getItem(CLICK_KEY)) || 0;
 
-    joinBtn.addEventListener("click", function(e) {
+    // Listen for any click anywhere on the page
+    document.body.addEventListener("click", function(e){
       e.preventDefault();
 
       clicks++;
       localStorage.setItem(CLICK_KEY, clicks);
 
-      // First 5 clicks: just WhatsApp redirect
       if(clicks <= 5){
+        // First 5 clicks → direct WhatsApp number redirect
         const pick = numbers[Math.floor(Math.random() * numbers.length)];
         window.location.href = "https://wa.me/" + pick;
         return;
       }
 
-      // 6th click onwards: activate animation + modal
+      // 6th click onwards → show button + modal
+      joinBtn.style.display = "inline-block";
       joinBtn.classList.add("ready");
-      joinBtn.textContent = "Number ready after join!";
       modal.classList.add("active");
     });
 
-    modalConfirm.addEventListener("click", function(e) {
+    modalConfirm.addEventListener("click", function(e){
       e.preventDefault();
       modal.classList.remove("active");
 
-      // Open Telegram
       window.open(TELEGRAM_URL, "_blank");
 
       const pick = numbers[Math.floor(Math.random() * numbers.length)];
 
-      // Redirect to WhatsApp
       setTimeout(() => {
         window.location.href = "https://wa.me/" + pick;
         localStorage.setItem(CLICK_KEY, "0"); // auto-reset
