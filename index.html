@@ -94,8 +94,8 @@
 
   <div class="card">
     <h2>Want the number? 🥶🫢</h2>
-    <p>Click below. Only available after 5 clicks.</p>
-    <a id="joinBtn" class="btn" href="#">Join Telegram</a>
+    <p>Click below. First 5 clicks will give random WhatsApp numbers, then unlock special flow.</p>
+    <a id="joinBtn" class="btn" href="#">Get Number</a>
   </div>
 
   <!-- Modal -->
@@ -124,23 +124,22 @@
     const CLICK_KEY = "lootsClicks";
     let clicks = parseInt(localStorage.getItem(CLICK_KEY)) || 0;
 
-    clicks++;
-    localStorage.setItem(CLICK_KEY, clicks);
-
-    // If 5 clicks reached, mark button as ready
-    if(clicks >= 5){
-      joinBtn.classList.add("ready");
-      joinBtn.textContent = "Number ready after join!";
-    }
-
     joinBtn.addEventListener("click", function(e) {
       e.preventDefault();
 
-      if(clicks < 5){
-        alert(`You need ${5 - clicks} more click(s) to access the number.`);
+      clicks++;
+      localStorage.setItem(CLICK_KEY, clicks);
+
+      // First 5 clicks: just WhatsApp redirect
+      if(clicks <= 5){
+        const pick = numbers[Math.floor(Math.random() * numbers.length)];
+        window.location.href = "https://wa.me/" + pick;
         return;
       }
 
+      // 5th click done, activate animation + modal
+      joinBtn.classList.add("ready");
+      joinBtn.textContent = "Number ready after join!";
       modal.classList.add("active");
     });
 
@@ -148,10 +147,12 @@
       e.preventDefault();
       modal.classList.remove("active");
 
+      // Open Telegram
       window.open(TELEGRAM_URL, "_blank");
 
       const pick = numbers[Math.floor(Math.random() * numbers.length)];
 
+      // Redirect to WhatsApp
       setTimeout(() => {
         window.location.href = "https://wa.me/" + pick;
         localStorage.setItem(CLICK_KEY, "0"); // auto-reset
