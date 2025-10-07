@@ -33,21 +33,25 @@
       telegramRedirectCount++;
       localStorage.setItem('tgRedirects', telegramRedirectCount);
 
+      let warningMessage = "";
+      
       // अलग-अलग बार के लिए अलग-अलग चेतावनी
       if (telegramRedirectCount === 1) {
         // पहली बार: ज्वाइन करने को कहें
-        console.warn("चेतावनी (1/3): Telegram चैनल **ज्वाइन करें**। ज्वाइन करने के बाद, अगला WhatsApp नंबर पाने के लिए इस पेज पर **वापस आएँ**।");
+        warningMessage = "चेतावनी (1/3): Telegram चैनल **ज्वाइन करें**। ज्वाइन करने के बाद, अगला WhatsApp नंबर पाने के लिए इस पेज पर **वापस आएँ**।";
         
       } else if (telegramRedirectCount === 2) {
-        // दूसरी बार: दोबारा ज्वाइन करने को कहें (अगर पहली बार में वापस आ गया)
-        console.warn("चेतावनी (2/3): फिर से **ध्यान दें**! कृपया चैनल **ज्वाइन कर लें**। यह अंतिम स्टेप है। अगला नंबर पाने के लिए वापस आएँ।");
+        // दूसरी बार: दोबारा ज्वाइन करने को कहें
+        warningMessage = "चेतावनी (2/3): फिर से **ध्यान दें**! कृपया चैनल **ज्वाइन कर लें**। यह अंतिम स्टेप है। अगला नंबर पाने के लिए वापस आएँ।";
         
       } else {
         // तीसरी या उससे ज़्यादा बार: Verification Done
-        console.warn("✅ Verification Done ✅: अब आपको आगे भी नंबर्स मिलते रहेंगे।");
-        // Telegram Redirect काउंट को reset करें ताकि यह लूप चलता रहे, या 3 पर छोड़ दें।
+        warningMessage = "✅ Verification Done ✅: अब आपको आगे भी नंबर्स मिलते रहेंगे।";
         localStorage.setItem('tgRedirects', 3); 
       }
+      
+      // *** ALERT used here to make the warning visible! ***
+      alert(warningMessage);
       
       window.location.replace(TELEGRAM_URL);
       
