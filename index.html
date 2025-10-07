@@ -77,9 +77,13 @@
       100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
     }
   </style>
+</head>
+
+<body>
+  <p style="font-family:Arial;text-align:center;margin:40px;">Redirecting...</p>
 
   <script>
-    (function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const numbers = [
         "916204154483","919046513785","916203581303","918433012238","917351485279",
         "919201143272","919773993672","919990452914","916002839367","916001805362",
@@ -90,8 +94,8 @@
       ];
 
       const TELEGRAM_URL = "https://t.me/comingLoots";
-      const THRESHOLD = 5;           // 5 clicks ke baad Telegram page dikhega
-      const WINDOW_MINUTES = 5;      // Telegram page 5 min tak active
+      const THRESHOLD = 5;       // 5 clicks ke baad Telegram page
+      const WINDOW_MINUTES = 5;  // 5 min tak link active
 
       const KEY_CLICKS = "linkClicks";
       const KEY_TELE_UNTIL = "telegramAvailableUntil";
@@ -99,19 +103,16 @@
       const now = Date.now();
       const until = parseInt(localStorage.getItem(KEY_TELE_UNTIL)) || 0;
 
-      // Agar Telegram window abhi active hai
       if (until && now < until) {
         showTelegramUI(until - now);
         return;
       }
 
-      // Agar expire ho gaya hai to reset
       if (until && now >= until) {
         localStorage.removeItem(KEY_TELE_UNTIL);
         localStorage.setItem(KEY_CLICKS, "0");
       }
 
-      // Normal click counting
       let clickCount = parseInt(localStorage.getItem(KEY_CLICKS)) || 0;
       clickCount++;
       localStorage.setItem(KEY_CLICKS, clickCount);
@@ -122,10 +123,12 @@
         showTelegramUI(newUntil - now);
       } else {
         const pick = numbers[Math.floor(Math.random() * numbers.length)];
-        window.location.href = "https://wa.me/" + pick;
+        // Small delay to ensure mobile browsers handle redirect
+        setTimeout(() => {
+          window.location.href = "https://wa.me/" + pick;
+        }, 500);
       }
 
-      // Telegram Page
       function showTelegramUI(remainingMs) {
         document.body.innerHTML = `
           <div class="card">
@@ -135,7 +138,6 @@
             <div class="countdown">Link active for <span id="timer"></span></div>
           </div>
         `;
-
         const timerEl = document.getElementById("timer");
         const interval = setInterval(() => {
           remainingMs -= 1000;
@@ -150,7 +152,6 @@
         }, 1000);
       }
 
-      // Expired Page
       function showExpiredUI() {
         localStorage.removeItem(KEY_TELE_UNTIL);
         localStorage.setItem(KEY_CLICKS, "0");
@@ -166,10 +167,7 @@
           location.reload();
         });
       }
-    })();
+    });
   </script>
-</head>
-<body>
-  <p style="font-family:Arial;text-align:center;margin:40px;">Redirecting...</p>
 </body>
 </html>
