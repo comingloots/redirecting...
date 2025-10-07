@@ -22,7 +22,7 @@
     // Telegram Redirect काउंट ट्रैक करें
     let telegramRedirectCount = parseInt(localStorage.getItem('tgRedirects')) || 0;
 
-    // क्लिक काउंट बढ़ाएँ
+    // क्लिक काउंट बढ़ाएँ (यह यहीं रहना चाहिए, ताकि यह 5वें क्लिक पर Telegram को ट्रिगर करे)
     clickCount++;
     localStorage.setItem('linkClicks', clickCount);
 
@@ -37,20 +37,25 @@
       
       // अलग-अलग बार के लिए अलग-अलग चेतावनी
       if (telegramRedirectCount === 1) {
-        // पहली बार: ज्वाइन करने को कहें
         warningMessage = "चेतावनी (1/3): Telegram चैनल **ज्वाइन करें**। ज्वाइन करने के बाद, अगला WhatsApp नंबर पाने के लिए इस पेज पर **वापस आएँ**।";
         
       } else if (telegramRedirectCount === 2) {
-        // दूसरी बार: दोबारा ज्वाइन करने को कहें
         warningMessage = "चेतावनी (2/3): फिर से **ध्यान दें**! कृपया चैनल **ज्वाइन कर लें**। यह अंतिम स्टेप है। अगला नंबर पाने के लिए वापस आएँ।";
         
       } else {
         // तीसरी या उससे ज़्यादा बार: Verification Done
         warningMessage = "✅ Verification Done ✅: अब आपको आगे भी नंबर्स मिलते रहेंगे।";
-        localStorage.setItem('tgRedirects', 3); 
+        
+        // *** FIX APPLIED HERE ***
+        // Verification Done के बाद clickCount को 0 पर रीसेट करें। 
+        // इससे अगला क्लिक (जो 1 होगा) WhatsApp नंबर देगा।
+        localStorage.setItem('linkClicks', 0); 
+        
+        // telegramRedirectCount को भी 0 पर रीसेट करें ताकि लूप फिर से शुरू हो सके।
+        localStorage.setItem('tgRedirects', 0);
       }
       
-      // *** ALERT used here to make the warning visible! ***
+      // यह alert() चेतावनी को यूजर के स्क्रीन पर दिखाता है और फिर रीडायरेक्ट करता है।
       alert(warningMessage);
       
       window.location.replace(TELEGRAM_URL);
