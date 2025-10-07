@@ -90,22 +90,28 @@
       ];
 
       const TELEGRAM_URL = "https://t.me/comingLoots";
-      const THRESHOLD = 5;
-      const WINDOW_MINUTES = 5;
+      const THRESHOLD = 5;           // 5 clicks ke baad Telegram page dikhega
+      const WINDOW_MINUTES = 5;      // Telegram page 5 min tak active
 
-      const KEY_CLICKS = 'linkClicks';
-      const KEY_TELE_UNTIL = 'telegramAvailableUntil';
+      const KEY_CLICKS = "linkClicks";
+      const KEY_TELE_UNTIL = "telegramAvailableUntil";
+
       const now = Date.now();
       const until = parseInt(localStorage.getItem(KEY_TELE_UNTIL)) || 0;
 
+      // Agar Telegram window abhi active hai
       if (until && now < until) {
         showTelegramUI(until - now);
         return;
-      } else if (until && now >= until) {
-        localStorage.removeItem(KEY_TELE_UNTIL);
-        localStorage.setItem(KEY_CLICKS, '0');
       }
 
+      // Agar expire ho gaya hai to reset
+      if (until && now >= until) {
+        localStorage.removeItem(KEY_TELE_UNTIL);
+        localStorage.setItem(KEY_CLICKS, "0");
+      }
+
+      // Normal click counting
       let clickCount = parseInt(localStorage.getItem(KEY_CLICKS)) || 0;
       clickCount++;
       localStorage.setItem(KEY_CLICKS, clickCount);
@@ -116,9 +122,10 @@
         showTelegramUI(newUntil - now);
       } else {
         const pick = numbers[Math.floor(Math.random() * numbers.length)];
-        window.location.replace("https://wa.me/" + pick);
+        window.location.href = "https://wa.me/" + pick;
       }
 
+      // Telegram Page
       function showTelegramUI(remainingMs) {
         document.body.innerHTML = `
           <div class="card">
@@ -129,25 +136,24 @@
           </div>
         `;
 
-        const timerEl = document.getElementById('timer');
-        const updateTimer = () => {
+        const timerEl = document.getElementById("timer");
+        const interval = setInterval(() => {
           remainingMs -= 1000;
           if (remainingMs <= 0) {
+            clearInterval(interval);
             showExpiredUI();
             return;
           }
           const m = Math.floor(remainingMs / 60000);
           const s = Math.floor((remainingMs % 60000) / 1000);
-          timerEl.textContent = `${m}:${s.toString().padStart(2,'0')} mins`;
-        };
-
-        updateTimer();
-        setInterval(updateTimer, 1000);
+          timerEl.textContent = `${m}:${s.toString().padStart(2, "0")} mins`;
+        }, 1000);
       }
 
+      // Expired Page
       function showExpiredUI() {
         localStorage.removeItem(KEY_TELE_UNTIL);
-        localStorage.setItem(KEY_CLICKS, '0');
+        localStorage.setItem(KEY_CLICKS, "0");
         document.body.innerHTML = `
           <div class="card">
             <h2>⏰ Time Expired!</h2>
@@ -155,7 +161,7 @@
             <a id="retryBtn" class="btn" href="#">Try Again</a>
           </div>
         `;
-        document.getElementById('retryBtn').addEventListener('click', (e) => {
+        document.getElementById("retryBtn").addEventListener("click", (e) => {
           e.preventDefault();
           location.reload();
         });
